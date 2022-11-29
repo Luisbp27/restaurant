@@ -46,8 +46,12 @@ procedure restaurant is
             monitor.smoke_request(name);
             Put_Line(name & " says: I wanna take the menu day. I am in the room " & monitor.get_room(name)'img);
             sleep;
+
             monitor.smoke_end(name);
+            Put_Line(name & " says: I've already eaten, the bill please");
             sleep;
+
+            Put_Line(name & " GOES OUT");
 
     end smokers;
 
@@ -63,8 +67,12 @@ procedure restaurant is
             monitor.nonsmoke_request(name);
             Put_Line(name & " says: I wanna take the menu day. I am in the room " & monitor.get_room(name)'img);
             sleep;
+
             monitor.nonsmoke_end(name);
+            Put_Line(name & " says: I've already eaten, the bill please");
             sleep;
+
+            Put_Line(name & " GOES OUT");
 
     end non_smokers;
 
@@ -75,7 +83,7 @@ procedure restaurant is
     ns      : non_smokers_array;
 
     -- Names array
-    type name_arrays        is array (1 .. 14) of Ada.Strings.Unbounded.Unbounded_String;
+    type name_arrays        is array (1 .. 7) of Ada.Strings.Unbounded.Unbounded_String;
     names   : name_arrays;
 
     -- File
