@@ -1,9 +1,10 @@
 with Ada.Text_Io;               use Ada.Text_Io;
-with master;                    use master;
-with Ada.Strings.Unbounded;     use Ada.Strings.Unbounded;
 with Ada.Text_IO.Unbounded_IO;  use Ada.Text_IO.Unbounded_IO;
 with Ada.Task_Identification;   use Ada.Task_Identification;
+with Ada.Strings.Unbounded;     use Ada.Strings.Unbounded;
 with Ada.Numerics.Discrete_Random;    
+
+with master;                    use master;
 
 procedure restaurant is
 
@@ -11,15 +12,16 @@ procedure restaurant is
     TABLES      : constant integer := 3; -- Number of tables per room
 
     monitor     : ClientMonitor; -- Clients monitor
-    names_file       : constant String := "names.txt";
+    names_file  : constant String := "names.txt";
 
+    -- Sleep type
     type sleepTime is range 1 .. 3;
     package time is new Ada.Numerics.Discrete_Random (sleepTime);
     Generator : time.Generator;
 
+    -- Tasks types
     task type smokers is
         entry Start (Name_Client : in Unbounded_String);
-
     end smokers;
 
     task type non_smokers is
@@ -32,34 +34,36 @@ procedure restaurant is
         delay Duration (time.Random (Generator));
     end sleep;
 
-    -- Smoker tasks
+    -- Smoker task
     task body smokers is
         name : Unbounded_String;
     begin
         accept Start (Name_Client : in Unbounded_String) do 
             name := Name_Client;
         end Start;
-            Put_Line("Hi, smoker number: " & name);
+            Put_Line("Good morning, I am " & name & " and I smoke");
 
-            monitor.smoke_request; 
+            monitor.smoke_request(name);
+            Put_Line(name & " says: I wanna take the menu day. I am in the room " & monitor.get_room(name)'img);
             sleep;
-            monitor.smoke_end;
+            monitor.smoke_end(name);
             sleep;
 
     end smokers;
 
-    -- Non-Smoker tasks
+    -- Non-Smoker task
     task body non_smokers is
         name : Unbounded_String;
     begin
         accept Start (Name_Client : in Unbounded_String) do
             name := Name_Client;
         end Start;
-            Put_Line("Hi, non smoker number: " & name);
+            Put_Line("Good morning, I am " & name & " and I don't smoke");
 
-            monitor.nonsmoke_request;
+            monitor.nonsmoke_request(name);
+            Put_Line(name & " says: I wanna take the menu day. I am in the room " & monitor.get_room(name)'img);
             sleep;
-            monitor.nonsmoke_end;
+            monitor.nonsmoke_end(name);
             sleep;
 
     end non_smokers;
@@ -67,16 +71,15 @@ procedure restaurant is
     -- Tasks arrays
     type smokers_array      is array (1 .. 7) of smokers;
     type non_smokers_array  is array (1 .. 7) of non_smokers;
-    s           : smokers_array;
-    ns          : non_smokers_array;
+    s       : smokers_array;
+    ns      : non_smokers_array;
 
     -- Names array
-    subtype name_index      is Positive range Positive'first .. 14;
-    type name_arrays        is array (name_index) of Unbounded_String;
-    names : name_arrays;
+    type name_arrays        is array (1 .. 14) of Ada.Strings.Unbounded.Unbounded_String;
+    names   : name_arrays;
 
     -- File
-    file        : File_Type;
+    file     : File_Type;
 
 begin
     -- Read the file of names
@@ -86,13 +89,16 @@ begin
     end loop;
     Close(file);
 
+    -- First outputs
     Put_Line("++++++++++ The master is ready");
     Put_Line("++++++++++ There is " & ROOMS'img & " with a capacity of " & TABLES'img & " clients each");
-    monitor.init;
+    
+    monitor.init; -- Monitor initialization
+
     -- Tasks initialization
     for i in names'range loop
-        s(i).Start(names(name_arrays'first + i));
-        ns(i + 1).Start(names(name_arrays'first + i + 1));
+        s(i).Start(names(i));
+        ns(i).Start(names(15 - i));
     end loop;
 
 end restaurant;
