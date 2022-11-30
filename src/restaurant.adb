@@ -96,10 +96,6 @@ begin
         names(i) := To_Unbounded_String(Get_Line(file));
     end loop;
     Close(file);
-
-    -- First outputs
-    Put_Line("++++++++++ The master is ready");
-    Put_Line("++++++++++ There is " & ROOMS'img & " with a capacity of " & TABLES'img & " clients each");
     
     monitor.init; -- Monitor initialization
 

@@ -23,6 +23,10 @@ package body master is
                 client_names(i) := To_Unbounded_String("free");
             end loop;
 
+            -- First outputs
+            Put_Line("++++++++++ The master is ready");
+            Put_Line("++++++++++ There is " & num_rooms'img & " with a capacity of " & num_tables'img & " clients each");
+
         end init;
 
         -- Return the room of the name passed by parameter
@@ -60,7 +64,7 @@ package body master is
         
         end get_type;
 
-        entry smoke_request(name : Unbounded_String) when (free_rooms > 0) or (smokers > 0) is
+        entry smoke_request(name : in Unbounded_String) when (free_rooms > 0) or (smokers > 0) is
             found_room  : Boolean := False;
             found_table : Boolean := False;
             room        : Integer := 1;
@@ -72,9 +76,10 @@ package body master is
         begin
             Put_Line("Entra fumador " & name);
             -- Search if there is a smooking room available
-            while found_room = False and room /= 4 loop
+            while (found_room = False) and (room /= num_rooms + 1) loop
                 t := room_type(room);
                 Put_Line("Salon: " & room'img & " Tipo: " & t'img);
+                
                 -- If the room is free or smoking and there is capacity
                 if (room_type(room) = -1 or room_type(room) = 1) and room_capacity(room) > 0 then
                     found_room := True;
@@ -89,8 +94,8 @@ package body master is
             if found_room = True then 
                 -- Found the table and took it with a smoker
                 table := initial_pos;
-                while found_table = False and table /= initial_pos + 3 loop
-                    if client_names(table) = To_Unbounded_String("free") then
+                while found_table = False and table /= initial_pos + num_tables loop
+                    if client_names(table) = "free" then
                         found_table := True;
                         client_names(table) := name;
 
@@ -118,7 +123,7 @@ package body master is
 
         end smoke_request;
 
-        entry nonsmoke_request(name : Unbounded_String) when (free_rooms > 0) or (non_smokers > 0) is
+        entry nonsmoke_request(name : in Unbounded_String) when (free_rooms > 0) or (non_smokers > 0) is
             found_room  : Boolean := False;
             found_table : Boolean := False;
             room        : Integer := 1;
@@ -172,7 +177,7 @@ package body master is
 
         end nonsmoke_request;
 
-        procedure smoke_end(name : Unbounded_String) is
+        procedure smoke_end(name : in Unbounded_String) is
             room        : Integer;
             capacity    : Integer;
             r_type      : Integer;
@@ -207,7 +212,7 @@ package body master is
 
         end smoke_end;
 
-        procedure nonsmoke_end(name : Unbounded_String) is
+        procedure nonsmoke_end(name : in Unbounded_String) is
             room        : Integer;
             capacity    : Integer;
             r_type      : Integer;

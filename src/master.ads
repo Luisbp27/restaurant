@@ -17,9 +17,12 @@ package master is
 
     private
         -- This three variables added together must always give 3 
-        free_rooms      : integer := 3;
-        smokers         : integer := 0;
-        non_smokers     : integer := 0;
+        free_rooms      : Integer := 3;
+        smokers         : Integer := 0;
+        non_smokers     : Integer := 0;
+
+        num_rooms       : Integer := 3;
+        num_tables      : Integer := 3;
 
         room_type       : room_type_array; -- Free = -1,  Smokers = 1, Non smokers = 0
         room_capacity   : room_capacity_array; -- Number of clients in each room
