@@ -83,7 +83,7 @@ procedure restaurant is
     ns      : non_smokers_array;
 
     -- Names array
-    type name_arrays        is array (1 .. 7) of Ada.Strings.Unbounded.Unbounded_String;
+    type name_arrays        is array (1 .. 14) of Ada.Strings.Unbounded.Unbounded_String;
     names   : name_arrays;
 
     -- File
@@ -105,8 +105,11 @@ begin
 
     -- Tasks initialization
     for i in names'range loop
-        s(i).Start(names(i));
-        ns(i).Start(names(15 - i));
+        if i mod 2 = 0 then
+            s(i).Start(names(i));
+        else
+            ns(i).Start(names(i));
+        end if;
     end loop;
 
 end restaurant;

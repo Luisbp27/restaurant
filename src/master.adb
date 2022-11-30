@@ -67,43 +67,47 @@ package body master is
             table       : Integer;
             capacity    : Integer;
             initial_pos : constant Integer := ((room - 1) * 3) + 1;
+
+            t : Integer;
         begin
+            Put_Line("Entra fumador " & name);
             -- Search if there is a smooking room available
-            loop
+            while found_room = False and room /= 4 loop
+                t := room_type(room);
+                Put_Line("Salon: " & room'img & " Tipo: " & t'img);
                 -- If the room is free or smoking and there is capacity
                 if (room_type(room) = -1 or room_type(room) = 1) and room_capacity(room) > 0 then
                     found_room := True;
-
-                    -- Found the table and took it with a smoker
-                    table := initial_pos;
-                    loop
-                        if client_names(table) = To_Unbounded_String("free") then
-                            found_table := True;
-                            client_names(table) := name;
-
-                            room_capacity(room) := room_capacity(room) - 1;
-                            capacity := room_capacity(room);
-                            Put_Line("---------- " & name & " has a table in the smooker room " & room'img & ". Disponibility: " & capacity'img);
-
-                            -- We decrement the number of smoker rooms because the room is full, and we can't enter again
-                            if room_capacity(room) = 0 then
-                                smokers := smokers - 1;
-                            end if;
-                        
-                        else
-                            table := table + 1;
-                        end if;
-
-                        exit when found_table = True or table = initial_pos + 3;
-
-                    end loop;
                 else
                     room := room + 1;
                 end if;
 
-                exit when found_room = True or room = 4;
-
+                Put_Line("Salon trobat: " & found_room'img & " Salon: " & room'img);
             end loop;
+
+            -- If founded a room, now we gonna find a table
+            if found_room = True then 
+                -- Found the table and took it with a smoker
+                table := initial_pos;
+                while found_table = False and table /= initial_pos + 3 loop
+                    if client_names(table) = To_Unbounded_String("free") then
+                        found_table := True;
+                        client_names(table) := name;
+
+                        room_capacity(room) := room_capacity(room) - 1;
+                        capacity := room_capacity(room);
+                        Put_Line("---------- " & name & " has a table in the smooker room " & room'img & ". Disponibility: " & capacity'img);
+
+                        -- We decrement the number of smoker rooms because the room is full, and we can't enter again
+                        if room_capacity(room) = 0 then
+                            smokers := smokers - 1;
+                        end if;
+                    
+                    else
+                        table := table + 1;
+                    end if;
+                end loop;
+            end if;
 
             -- If is the first smoker, the room is for smokers
             if room_capacity(room) = 2 then
