@@ -8,16 +8,18 @@ with master;                    use master;
 
 procedure restaurant is
 
-    ROOMS       : constant integer := 3; -- Number of salons
-    TABLES      : constant integer := 3; -- Number of tables per room
-
     monitor     : ClientMonitor; -- Clients monitor
-    names_file  : constant String := "names.txt";
 
     -- Sleep type
     type sleepTime is range 1 .. 3;
     package time is new Ada.Numerics.Discrete_Random (sleepTime);
     Generator : time.Generator;
+
+    -- Randomly delay for tasks
+    procedure sleep is
+    begin
+        delay Duration (time.Random (Generator));
+    end sleep;
 
     -- Tasks types
     task type smokers is
@@ -27,12 +29,6 @@ procedure restaurant is
     task type non_smokers is
         entry Start (Name_Client : in Unbounded_String);
     end non_smokers;
-
-    -- Randomly delay for tasks
-    procedure sleep is
-    begin
-        delay Duration (time.Random (Generator));
-    end sleep;
 
     -- Smoker task
     task body smokers is
@@ -49,8 +45,6 @@ procedure restaurant is
 
             monitor.smoke_end(name);
             Put_Line(name & " says: I've already eaten, the bill please");
-            sleep;
-
             Put_Line(name & " GOES OUT");
 
     end smokers;
@@ -70,8 +64,6 @@ procedure restaurant is
 
             monitor.nonsmoke_end(name);
             Put_Line(name & " says: I've already eaten, the bill please");
-            sleep;
-
             Put_Line(name & " GOES OUT");
 
     end non_smokers;
@@ -91,7 +83,7 @@ procedure restaurant is
 
 begin
     -- Read the file of names
-    Open(file, In_File, names_file);
+    Open(file, In_File, "names.txt");
     for i in names'range loop
         names(i) := To_Unbounded_String(Get_Line(file));
     end loop;
