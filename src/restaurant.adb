@@ -33,17 +33,18 @@ procedure restaurant is
     -- Smoker task
     task body smokers is
         name : Unbounded_String;
+        room : Integer;
     begin
         accept Start (Name_Client : in Unbounded_String) do 
             name := Name_Client;
         end Start;
-            Put_Line("Good morning, I am " & name & " and I smoke");
+            Put_Line("GOOD MORNING, I am " & name & " and I smoke");
 
-            monitor.smoke_request(name);
-            Put_Line(name & " says: I wanna take the menu day. I am in the room " & monitor.get_room(name)'img);
+            monitor.smoke_request(name, room);
+            Put_Line(name & " says: I wanna take the menu day. I am in the room " & room'img);
             sleep;
 
-            monitor.smoke_end(name);
+            monitor.smoke_end(name, room);
             Put_Line(name & " says: I've already eaten, the bill please");
             Put_Line(name & " GOES OUT");
 
@@ -52,19 +53,20 @@ procedure restaurant is
     -- Non-Smoker task
     task body non_smokers is
         name : Unbounded_String;
+        room : Integer;
     begin
         accept Start (Name_Client : in Unbounded_String) do
             name := Name_Client;
         end Start;
-            Put_Line("Good morning, I am " & name & " and I don't smoke");
+            Put_Line("  GOOD MORNING, I am " & name & " and I don't smoke");
 
-            monitor.nonsmoke_request(name);
-            Put_Line(name & " says: I wanna take the menu day. I am in the room " & monitor.get_room(name)'img);
+            monitor.nonsmoke_request(name, room);
+            Put_Line("  " & name & " says: I wanna take the menu day. I am in the room " & room'img);
             sleep;
 
-            monitor.nonsmoke_end(name);
-            Put_Line(name & " says: I've already eaten, the bill please");
-            Put_Line(name & " GOES OUT");
+            monitor.nonsmoke_end(name, room);
+            Put_Line("  " & name & " says: I've already eaten, the bill please");
+            Put_Line("  " & name & " GOES OUT");
 
     end non_smokers;
 
@@ -94,8 +96,7 @@ begin
     -- Tasks initialization
     for i in names'range loop
         if i mod 2 = 0 then
-            Put_Line("Fumador");
-            -- s(i).Start(names(i));
+            s(i).Start(names(i));
         else
             ns(i).Start(names(i));
         end if;
