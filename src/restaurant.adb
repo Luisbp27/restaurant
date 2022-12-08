@@ -94,7 +94,8 @@ begin
     -- Tasks initialization
     for i in names'range loop
         if i mod 2 = 0 then
-            s(i).Start(names(i));
+            Put_Line("Fumador");
+            -- s(i).Start(names(i));
         else
             ns(i).Start(names(i));
         end if;

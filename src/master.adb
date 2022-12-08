@@ -32,23 +32,31 @@ package body master is
         -- Return the room of the name passed by parameter
         function get_room(name : Unbounded_String) return Integer is
             room : Integer;
+            found : Boolean := False;
+            i : Integer := 1;
         begin
 
-            for i in client_names'range loop
+            while found /= True loop
+
                 if client_names(i) = name then
+                    found := True;
+
                     if i mod num_rooms = 0 then
-                        room := i / num_rooms;
+                        room:= i / num_rooms;
                     else
-                        room := (i / num_rooms) + 1;
+                        room:= (i / num_rooms) + 1;
                     end if;
                 end if;
+
+                i := i + 1;
+
             end loop;
-
+            
             return room;
-
+            
         end get_room; 
 
-        function get_type(r_type : Integer) return Unbounded_String is
+        function get_type(r_type : in Integer) return Unbounded_String is
             type_string : Unbounded_String;
         begin
             
@@ -64,7 +72,56 @@ package body master is
         
         end get_type;
 
-        entry smoke_request(name : in Unbounded_String) when (free_rooms > 0) or (smokers > 0) is
+        function search_room(r_type : in Integer) return Integer is
+            room : Integer := 0;
+        begin
+
+            for i in 1 .. num_rooms loop
+                if (room_type(i) = r_type and room_capacity(i) > 0) or (room_type(i) = -1) then
+                    room := i;
+
+                    return room;
+                end if;
+
+            end loop;
+
+            return room;
+
+        end search_room;
+
+        procedure get_table(name : in Unbounded_String; room_num : in Integer) is
+            table : Integer;
+            initial_pos : constant Integer := ((room_num - 1) * 3) + 1;
+        begin
+            -- NO PILLA LA MESA BIEN
+            for i in initial_pos .. initial_pos + (num_tables - 1) loop
+                if client_names(i) = "free" then
+                    table := i;
+                    client_names(i) := name;
+                end if;
+            end loop;
+            Put_Line("Mesa: " & table'img);
+        end get_table;
+
+        function is_available(r_type : in Integer) return Boolean is
+            room : Boolean := False;
+        begin
+            Put_Line("Entrado");
+            for i in 1 .. num_rooms loop
+
+                if (room_type(i) = r_type and room_capacity(i) > 0) or (room_type(i) = -1) then
+                    room := True;
+
+                    return room;
+                end if;
+
+            end loop;
+
+            return room;
+
+        end is_available;
+
+        entry smoke_request(name : in Unbounded_String) when (is_available(1) = True) is
             found_room  : Boolean := False;
             found_table : Boolean := False;
             room        : Integer := 1;
@@ -89,11 +146,6 @@ package body master is
                             capacity := room_capacity(room);
                             Put_Line("---------- " & name & " has a table in the smooker room " & room'img & ". Disponibility: " & capacity'img);
                         
-                            -- We decrement the number of smoker rooms because the room is full, and we can't enter again
-                            if room_capacity(room) = 0 then
-                                smokers := smokers - 1;
-                            end if;
-                        
                         else
                             table := table + 1;
                         end if;
@@ -111,63 +163,33 @@ package body master is
 
             -- If is the first smoker, the room is for smokers
             if room_capacity(room) = 2 then
-                free_rooms := free_rooms - 1;
-                smokers := smokers + 1;
                 room_type(room) := 1;
             end if;
 
         end smoke_request;
 
-        entry nonsmoke_request(name : in Unbounded_String) when (free_rooms > 0) or (non_smokers > 0) is
-            found_room  : Boolean := False;
-            found_table : Boolean := False;
-            room        : Integer := 1;
-            table       : Integer;
-            capacity    : Integer;
-            initial_pos : constant Integer := ((room - 1) * num_rooms) + 1;
+        entry nonsmoke_request(name : in Unbounded_String) when (is_available(0) = True) is
+            room        : Integer;
         begin
+            Put_Line("Entra en el request");
             -- Search if there is a non smooking room available
-            loop
-                -- If the room is free or non smoking and there is capacity
-                if (room_type(room) = -1 or room_type(room) = 0) and room_capacity(room) > 0 then
-                    found_room := True;
+            room := search_room(0);
 
-                    -- Found the table and took it with a non smoker
-                    table := initial_pos;
-                    loop
-                        if client_names(table) = To_Unbounded_String("free") then
-                            found_table := True;
-                            client_names(table) := name;
+            Put_Line(room'img);
 
-                            room_capacity(room) := room_capacity(room) - 1;
-                            capacity := room_capacity(room);
-                            Put_Line("********** " & name & " has a table in the non smooker room " & room'img & ". Disponibility: " & capacity'img);
-                        
-                            -- We decrement the number of non smoker rooms because the room is full, and we can't enter again
-                            if room_capacity(room) = 0 then
-                                non_smokers := non_smokers - 1;
-                            end if;
-                        
-                        else
-                            table := table + 1;
-                        end if;
+            if room > 0 then
+                
+                -- Modify the dynamic variables
+                room_capacity(room) := room_capacity(room) - 1;
 
-                        exit when found_table = True or table = initial_pos + num_tables;
+                -- Take a table for a non smoker
+                get_table(name, room);
 
-                    end loop;
-                else
-                    room := room + 1;
-                end if;
-
-                exit when found_room = True or room = num_rooms + 1;
-
-            end loop;
+            end if;
 
             -- If is the first non smoker, the room is for non smokers
             if room_capacity(room) = 2 then
                 room_type(room) := 0;
-                free_rooms := free_rooms - 1;
-                non_smokers := non_smokers + 1;
             end if;
 
         end nonsmoke_request;
@@ -189,15 +211,8 @@ package body master is
                 end if;
             end loop;
 
-            -- If the room is full and you go out the first, the room is available again
-            if room_capacity(room) = 1 then
-                smokers := smokers + 1;
-            end if;
-
             -- If yo go out the last
             if room_capacity(room) = num_tables then
-                free_rooms := free_rooms + 1;
-                smokers := smokers - 1;
                 room_type(room) := -1;
             end if;
 
@@ -224,15 +239,8 @@ package body master is
                 end if;
             end loop;
 
-            -- If the room is full and you go out the first, the room is available again
-            if room_capacity(room) = 1 then
-                non_smokers := non_smokers + 1;
-            end if;
-
             -- If yo go out the last
             if room_capacity(room) = num_tables then
-                free_rooms := free_rooms + 1;
-                non_smokers := non_smokers - 1;
                 room_type(room) := -1;
             end if;
 

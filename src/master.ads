@@ -13,20 +13,18 @@ package master is
     protected type ClientMonitor is 
         procedure init;
         function get_room(name : in Unbounded_String) return Integer;
+        function search_room(r_type : in Integer) return Integer;
+        procedure get_table(name : in Unbounded_String; room_num : in Integer);
+        function is_available(r_type : in Integer) return Boolean;
         entry smoke_request(name : in Unbounded_String);
         entry nonsmoke_request(name : in Unbounded_String);
         procedure smoke_end(name : in Unbounded_String);
         procedure nonsmoke_end(name : in Unbounded_String);
 
     private
-        -- This three variables added together must always give 3 
-        free_rooms      : Integer := 3;
-        smokers         : Integer := 0;
-        non_smokers     : Integer := 0;
 
         room_type       : room_type_array; -- Free = -1,  Smokers = 1, Non smokers = 0
         room_capacity   : room_capacity_array; -- Number of clients in each room
-
         client_names    : client_names_array; -- Name of client in each room [R1, R1, R1, R2, R2, R2, R3, R3, R3]
 
     end ClientMonitor;
