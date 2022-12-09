@@ -6,8 +6,8 @@ package master is
     num_rooms       : constant Integer := 3;
     num_tables      : constant Integer := 3;
 
-    type room_type_array        is array (-1 .. 1) of integer;
-    type room_capacity_array    is array (0 .. num_tables) of integer;
+    type room_type_array        is array (1 .. num_rooms) of Integer;
+    type room_capacity_array    is array (1 .. num_tables) of Integer;
 
     protected type ClientMonitor is 
 

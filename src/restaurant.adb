@@ -30,12 +30,14 @@ procedure restaurant is
     task body client is
         name    : Unbounded_String;
         room    : Integer;
-        typ     : Integer;
+        typ     : Integer; -- 0 is for non smoker and 1 for smoker
     begin
         accept Start (Name_Client : in Unbounded_String; t : in Integer) do 
             name    := Name_Client;
             typ     := t;
         end Start;
+
+            sleep;
 
             if typ = 0 then
 
@@ -43,7 +45,7 @@ procedure restaurant is
 
                 monitor.nonsmoke_request(name, room);
                 Put_Line("  " & name & " says: I wanna take the menu day. I am in the room " & room'img);
-                sleep;
+                delay(2.0);
 
                 monitor.nonsmoke_end(name, room);
                 Put_Line("  " & name & " says: I've already eaten, the bill please");
@@ -55,7 +57,7 @@ procedure restaurant is
 
                 monitor.smoke_request(name, room);
                 Put_Line(name & " says: I wanna take the menu day. I am in the room " & room'img);
-                sleep;
+                delay(2.0);
 
                 monitor.smoke_end(name, room);
                 Put_Line(name & " says: I've already eaten, the bill please");
