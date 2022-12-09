@@ -32,6 +32,7 @@ procedure restaurant is
         room    : Integer;
         typ     : Integer; -- 0 is for non smoker and 1 for smoker
     begin
+
         accept Start (Name_Client : in Unbounded_String; t : in Integer) do 
             name    := Name_Client;
             typ     := t;
@@ -45,7 +46,7 @@ procedure restaurant is
 
                 monitor.nonsmoke_request(name, room);
                 Put_Line("  " & name & " says: I wanna take the menu day. I am in the room " & room'img);
-                delay(2.0);
+                sleep;
 
                 monitor.nonsmoke_end(name, room);
                 Put_Line("  " & name & " says: I've already eaten, the bill please");
@@ -57,14 +58,13 @@ procedure restaurant is
 
                 monitor.smoke_request(name, room);
                 Put_Line(name & " says: I wanna take the menu day. I am in the room " & room'img);
-                delay(2.0);
+                sleep;
 
                 monitor.smoke_end(name, room);
                 Put_Line(name & " says: I've already eaten, the bill please");
                 Put_Line(name & " GOES OUT");
 
             end if;
-            
 
     end client;
 
@@ -87,15 +87,19 @@ begin
     end loop;
     Close(file);
     
-    monitor.init; -- Monitor initialization
+    -- Monitor initialization
+    monitor.init; 
 
-    -- Tasks initialization
+    -- Tasks running
     for i in names'range loop
+
+        -- Odd yarns for smokers and even numbers for non smokers
         if i mod 2 = 0 then
             clients(i).Start(names(i), 0);
         else
             clients(i).Start(names(i), 1);
         end if;
+
     end loop;
 
 end restaurant;

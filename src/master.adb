@@ -84,18 +84,15 @@ package body master is
             -- Search if there is a smooking room available
             room := search_room(1);
 
-            if room > 0 then
-                -- Update room type
-                room_type(room) := 1;
+            -- Update room type
+            room_type(room) := 1;
 
-                -- Update the dynamic variables
-                room_capacity(room) := room_capacity(room) - 1;
+            -- Update the dynamic variables
+            room_capacity(room) := room_capacity(room) - 1;
 
-                -- Print
-                capacity := room_capacity(room);
-                Put_Line("---------- " & name & " has a table at the room " & room'img & " of smokers. Disponibility: " & capacity'img);
-
-            end if;
+            -- Print
+            capacity := room_capacity(room);
+            Put_Line("---------- " & name & " has a table at the room " & room'img & " of smokers. Disponibility: " & capacity'img);
 
             -- If is the first smoker, the room is for smokers
             if room_capacity(room) = 2 then
@@ -109,19 +106,16 @@ package body master is
         begin
             -- Search if there is a non smooking room available
             room := search_room(0);
-            
-            if room > 0 then
-                -- Update room type
-                room_type(room) := 0;
+        
+            -- Update room type
+            room_type(room) := 0;
 
-                -- Update the dynamic variables
-                room_capacity(room) := room_capacity(room) - 1;
+            -- Update the dynamic variables
+            room_capacity(room) := room_capacity(room) - 1;
 
-                -- Print
-                capacity := room_capacity(room);
-                Put_Line("********** " & name & " has a table at the room " & room'img & " of non smokers. Disponibility: " & capacity'img);
-
-            end if;
+            -- Print
+            capacity := room_capacity(room);
+            Put_Line("********** " & name & " has a table at the room " & room'img & " of non smokers. Disponibility: " & capacity'img);
 
             -- If is the first non smoker, the room is for non smokers
             if room_capacity(room) = 2 then
