@@ -22,62 +22,58 @@ procedure restaurant is
     end sleep;
 
     -- Tasks types
-    task type smokers is
-        entry Start (Name_Client : in Unbounded_String);
-    end smokers;
-
-    task type non_smokers is
-        entry Start (Name_Client : in Unbounded_String);
-    end non_smokers;
+    task type client is
+        entry Start (Name_Client : in Unbounded_String; t : in Integer);
+    end client;
 
     -- Smoker task
-    task body smokers is
-        name : Unbounded_String;
-        room : Integer;
+    task body client is
+        name    : Unbounded_String;
+        room    : Integer;
+        typ     : Integer; -- 0 is for non smoker and 1 for smoker
     begin
-        accept Start (Name_Client : in Unbounded_String) do 
-            name := Name_Client;
-        end Start;
-            Put_Line("GOOD MORNING, I am " & name & " and I smoke");
 
-            monitor.smoke_request(name, room);
-            Put_Line(name & " says: I wanna take the menu day. I am in the room " & room'img);
+        accept Start (Name_Client : in Unbounded_String; t : in Integer) do 
+            name    := Name_Client;
+            typ     := t;
+        end Start;
+
             sleep;
 
-            monitor.smoke_end(name, room);
-            Put_Line(name & " says: I've already eaten, the bill please");
-            Put_Line(name & " GOES OUT");
+            if typ = 0 then
 
-    end smokers;
+                Put_Line("  GOOD MORNING, I am " & name & " and I don't smoke");
 
-    -- Non-Smoker task
-    task body non_smokers is
-        name : Unbounded_String;
-        room : Integer;
-    begin
-        accept Start (Name_Client : in Unbounded_String) do
-            name := Name_Client;
-        end Start;
-            Put_Line("  GOOD MORNING, I am " & name & " and I don't smoke");
+                monitor.nonsmoke_request(name, room);
+                Put_Line("  " & name & " says: I wanna take the menu day. I am in the room " & room'img);
+                sleep;
 
-            monitor.nonsmoke_request(name, room);
-            Put_Line("  " & name & " says: I wanna take the menu day. I am in the room " & room'img);
-            sleep;
+                monitor.nonsmoke_end(name, room);
+                Put_Line("  " & name & " says: I've already eaten, the bill please");
+                Put_Line("  " & name & " GOES OUT");
 
-            monitor.nonsmoke_end(name, room);
-            Put_Line("  " & name & " says: I've already eaten, the bill please");
-            Put_Line("  " & name & " GOES OUT");
+            else 
 
-    end non_smokers;
+                Put_Line("GOOD MORNING, I am " & name & " and I smoke");
 
-    -- Tasks arrays
-    type smokers_array      is array (1 .. 7) of smokers;
-    type non_smokers_array  is array (1 .. 7) of non_smokers;
-    s       : smokers_array;
-    ns      : non_smokers_array;
+                monitor.smoke_request(name, room);
+                Put_Line(name & " says: I wanna take the menu day. I am in the room " & room'img);
+                sleep;
+
+                monitor.smoke_end(name, room);
+                Put_Line(name & " says: I've already eaten, the bill please");
+                Put_Line(name & " GOES OUT");
+
+            end if;
+
+    end client;
+
+    -- Task array
+    type clients_array is array (1 .. 14) of client;
+    clients : clients_array;
 
     -- Names array
-    type name_arrays        is array (1 .. 14) of Ada.Strings.Unbounded.Unbounded_String;
+    type name_arrays is array (1 .. 14) of Ada.Strings.Unbounded.Unbounded_String;
     names   : name_arrays;
 
     -- File
@@ -91,15 +87,19 @@ begin
     end loop;
     Close(file);
     
-    monitor.init; -- Monitor initialization
+    -- Monitor initialization
+    monitor.init; 
 
-    -- Tasks initialization
+    -- Tasks running
     for i in names'range loop
+
+        -- Odd yarns for smokers and even numbers for non smokers
         if i mod 2 = 0 then
-            s(i).Start(names(i));
+            clients(i).Start(names(i), 0);
         else
-            ns(i).Start(names(i));
+            clients(i).Start(names(i), 1);
         end if;
+
     end loop;
 
 end restaurant;
