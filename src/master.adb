@@ -81,46 +81,40 @@ package body master is
         entry smoke_request(name : in Unbounded_String; room : out Integer) when (is_available(1) = True) is
             capacity    : Integer;
         begin
-            -- Search if there is a smooking room available
+            -- Take a smooking room available
             room := search_room(1);
 
-            -- Update room type
-            room_type(room) := 1;
-
-            -- Update the dynamic variables
+            -- Update the capacty of the room
             room_capacity(room) := room_capacity(room) - 1;
+
+            -- If is the first smoker, update room type for smokers
+            if room_capacity(room) = 2 then
+                room_type(room) := 1;
+            end if;
 
             -- Print
             capacity := room_capacity(room);
             Put_Line("---------- " & name & " has a table at the room " & room'img & " of smokers. Disponibility: " & capacity'img);
-
-            -- If is the first smoker, the room is for smokers
-            if room_capacity(room) = 2 then
-                room_type(room) := 1;
-            end if;
 
         end smoke_request;
 
         entry nonsmoke_request(name : in Unbounded_String; room : out Integer) when (is_available(0) = True) is
             capacity    : Integer;
         begin
-            -- Search if there is a non smooking room available
+            -- Take a non smooking room available
             room := search_room(0);
-        
-            -- Update room type
-            room_type(room) := 0;
 
-            -- Update the dynamic variables
+            -- Update the capacty of the room
             room_capacity(room) := room_capacity(room) - 1;
+
+            -- If is the first non smoker, update room type for non smokers
+            if room_capacity(room) = 2 then
+                room_type(room) := 0;
+            end if;
 
             -- Print
             capacity := room_capacity(room);
             Put_Line("********** " & name & " has a table at the room " & room'img & " of non smokers. Disponibility: " & capacity'img);
-
-            -- If is the first non smoker, the room is for non smokers
-            if room_capacity(room) = 2 then
-                room_type(room) := 0;
-            end if;
 
         end nonsmoke_request;
 
@@ -132,7 +126,7 @@ package body master is
             -- Update the capacity of the room
             room_capacity(room) := room_capacity(room) + 1;
 
-            -- If yo go out the last
+            -- If yo go out the last, update room type for free
             if room_capacity(room) = num_tables then
                 room_type(room) := -1;
             end if;
@@ -152,7 +146,7 @@ package body master is
             -- Update the capacity of the room
             room_capacity(room) := room_capacity(room) + 1;
 
-            -- If yo go out the last
+            -- If yo go out the last, update room type for free
             if room_capacity(room) = num_tables then
                 room_type(room) := -1;
             end if;

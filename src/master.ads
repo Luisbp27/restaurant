@@ -12,7 +12,7 @@ package master is
 
         procedure init; -- Initializes the monitor's private variables
 
-        function search_room(r_type : in Integer) return Integer; -- Returns an available room, depending on the type
+        function search_room(r_type : in Integer) return Integer; -- Returns a room, depending on the type
         function is_available(r_type : in Integer) return Boolean; -- Check if there's a room available, depending on the type
 
         entry smoke_request(name : in Unbounded_String; room : out Integer); -- Assign a table to a smoking client

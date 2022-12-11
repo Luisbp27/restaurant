@@ -8,7 +8,8 @@ with master;                    use master;
 
 procedure restaurant is
 
-    monitor     : ClientMonitor; -- Clients monitor
+    -- Clients monitor
+    monitor     : ClientMonitor; 
 
     -- Sleep type
     type sleepTime is range 1 .. 3;
@@ -26,7 +27,7 @@ procedure restaurant is
         entry Start (Name_Client : in Unbounded_String; t : in Integer);
     end client;
 
-    -- Smoker task
+    -- Client task
     task body client is
         name    : Unbounded_String;
         room    : Integer;
@@ -93,7 +94,7 @@ begin
     -- Tasks running
     for i in names'range loop
 
-        -- Odd yarns for smokers and even numbers for non smokers
+        -- Odd threads for smokers and even for non smokers
         if i mod 2 = 0 then
             clients(i).Start(names(i), 0);
         else
