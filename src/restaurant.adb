@@ -6,6 +6,8 @@ with Ada.Numerics.Discrete_Random;
 
 with master;                    use master;
 
+-- Authors: Lluis Barca & Alejandro Medina
+-- Link video: https://drive.google.com/file/d/1-KiXd-0xaiFDEu1cLq3uEspiwP3sP-cE/view?usp=sharing
 procedure restaurant is
 
     -- Clients monitor
@@ -19,10 +21,10 @@ procedure restaurant is
     -- Randomly delay for tasks
     procedure sleep is
     begin
-        delay Duration (time.Random (Generator));
+        delay Duration (time.Random(Generator));
     end sleep;
 
-    -- Tasks types
+    -- Task type
     task type client is
         entry Start (Name_Client : in Unbounded_String; t : in Integer);
     end client;

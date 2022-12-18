@@ -1,6 +1,7 @@
 with Ada.Text_Io;               use Ada.Text_Io;
 with Ada.Strings.Unbounded;     use Ada.Strings.Unbounded;
 
+-- Authors: Lluis Barca & Alejandro Medina
 package master is
 
     num_rooms       : constant Integer := 3;

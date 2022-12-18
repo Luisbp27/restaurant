@@ -2,6 +2,7 @@ with Ada.Strings.Unbounded;     use Ada.Strings.Unbounded;
 with Ada.Text_Io;               use Ada.Text_Io;
 with Ada.Text_IO.Unbounded_IO;  use Ada.Text_IO.Unbounded_IO;
 
+-- Authors: Lluis Barca & Alejandro Medina
 package body master is
 
     protected body ClientMonitor is
